@@ -1,0 +1,52 @@
+on:
+  release:
+    types: [created]
+
+name: Handle Release
+
+jobs:
+  build:
+    timeout-minutes: 15
+
+    runs-on: ubuntu-latest
+
+    env:
+      EXENAME: json2kt
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          cache: gradle
+
+      - name: Set env
+        run: |
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: Modify constants in source code
+        run: |
+          sed -i "s/0.0.0+0/$RELEASE_VERSION/g" src/main/kotlin/Main.kt
+
+      - name: Check that constants were modified
+        run: |
+          cat src/main/kotlin/Main.kt | grep "$RELEASE_VERSION" 
+
+      - name: Build binaries (with testing)
+        run: |
+          ./gradlew build
+
+      - name: Rename JAR
+        run: |
+          mkdir "./binaries"
+          mv build/libs/json2kt.shadow.jar ./binaries/json2kt.jar
+
+      - name: Attach JAR to release
+        uses: skx/github-action-publish-binaries@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: './binaries/*'
+
