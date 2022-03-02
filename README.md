@@ -42,9 +42,10 @@ Enter the input code when prompted. Add `;` after the code to indicate there wil
 no more input.
 
 ```json
-[ {"season": "Sol", "distance": 0.0000158},
-  {"season": "Proxima Centauri", "distance": 1067},
-  {"season": "Warsaw", "distance": 1323} ]
+[ {"season": "Winter", "days": 90.25},
+  {"season": "Spring", "days": 92},
+  {"season": "Summer", "days": 92},
+  {"season": "Autumn", "days": 91} ]
 ;
 ```
 
